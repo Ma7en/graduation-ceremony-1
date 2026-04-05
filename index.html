@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ar">
+    <head>
+        <meta charset="UTF-8" />
+        <title>تسجيل حضور الحفل</title>
+        <style>
+            body {
+                font-family: Arial;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+
+            .container {
+                background: rgba(0, 0, 0, 0.3);
+                padding: 30px;
+                border-radius: 15px;
+                width: 300px;
+            }
+
+            input {
+                width: 90%;
+                padding: 10px;
+                border: none;
+                border-radius: 8px;
+                margin-top: 10px;
+            }
+
+            button {
+                margin-top: 15px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                background: #00c9a7;
+                color: white;
+                cursor: pointer;
+                font-size: 16px;
+            }
+
+            button:hover {
+                background: #00a58c;
+            }
+
+            #result {
+                margin-top: 20px;
+                font-size: 18px;
+            }
+
+            .success {
+                color: #00ffae;
+            }
+            .error {
+                color: #ff6b6b;
+            }
+            .warning {
+                color: #ffd93d;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>🎉 تسجيل الحضور</h2>
+
+            <input type="text" id="userId" placeholder="ادخل رقمك" />
+            <br />
+            <button onclick="checkAttendance()">تسجيل</button>
+
+            <div id="result"></div>
+        </div>
+
+        <script>
+            const API_URL =
+                "https://script.google.com/macros/s/AKfycbwVXuM-KJyJnDZiwv4iDBADRWRyyVMMNqLt5ZzSRsfZrdPa5R83lockDtPGYewX6fgf/exec"; // حط لينك Google Script هنا
+
+            async function checkAttendance() {
+                const id = document.getElementById("userId").value;
+                const resultDiv = document.getElementById("result");
+
+                if (!id) {
+                    resultDiv.innerHTML = "❗ ادخل رقم";
+                    resultDiv.className = "warning";
+                    return;
+                }
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: "POST",
+                        body: JSON.stringify({ id }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === "success") {
+                        resultDiv.innerHTML = `✅ مرحبًا ${data.name} في الحفل 🎉`;
+                        resultDiv.className = "success";
+                    } else if (data.status === "exists") {
+                        resultDiv.innerHTML = "⚠️ تم تسجيل حضورك بالفعل";
+                        resultDiv.className = "warning";
+                    } else {
+                        resultDiv.innerHTML = "❌ الرقم غير موجود";
+                        resultDiv.className = "error";
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = "❌ حدث خطأ في الاتصال";
+                    resultDiv.className = "error";
+                }
+            }
+        </script>
+    </body>
+</html>
