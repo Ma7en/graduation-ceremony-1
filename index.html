@@ -2,108 +2,57 @@
 <html lang="ar">
     <head>
         <meta charset="UTF-8" />
-        <title>تسجيل حضور الحفل</title>
-        <style>
-            body {
-                font-family: Arial;
-                background: linear-gradient(135deg, #667eea, #764ba2);
-                color: white;
-                text-align: center;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-            }
-
-            .container {
-                background: rgba(0, 0, 0, 0.3);
-                padding: 30px;
-                border-radius: 15px;
-                width: 300px;
-            }
-
-            input {
-                width: 90%;
-                padding: 10px;
-                border: none;
-                border-radius: 8px;
-                margin-top: 10px;
-            }
-
-            button {
-                margin-top: 15px;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 8px;
-                background: #00c9a7;
-                color: white;
-                cursor: pointer;
-                font-size: 16px;
-            }
-
-            button:hover {
-                background: #00a58c;
-            }
-
-            #result {
-                margin-top: 20px;
-                font-size: 18px;
-            }
-
-            .success {
-                color: #00ffae;
-            }
-            .error {
-                color: #ff6b6b;
-            }
-            .warning {
-                color: #ffd93d;
-            }
-        </style>
+        <title>تسجيل الحضور</title>
     </head>
-    <body>
-        <div class="container">
-            <h2>🎉 تسجيل الحضور</h2>
+    <body style="text-align: center; margin-top: 100px; font-family: Arial">
+        <h2>🎉 تسجيل الحضور</h2>
 
-            <input type="text" id="userId" placeholder="ادخل رقمك" />
-            <br />
-            <button onclick="checkAttendance()">تسجيل</button>
+        <input type="text" id="userId" placeholder="ادخل رقمك" />
+        <br /><br />
 
-            <div id="result"></div>
-        </div>
+        <button onclick="send()">تسجيل</button>
+
+        <p id="result"></p>
+
+        <!-- iframe مخفي -->
+        <iframe id="hiddenFrame" style="display: none"></iframe>
 
         <script>
             const API_URL =
                 "https://script.google.com/macros/s/AKfycbwVXuM-KJyJnDZiwv4iDBADRWRyyVMMNqLt5ZzSRsfZrdPa5R83lockDtPGYewX6fgf/exec";
 
-            async function checkAttendance() {
+            function send() {
                 const id = document.getElementById("userId").value;
-                const resultDiv = document.getElementById("result");
 
                 if (!id) {
-                    resultDiv.innerHTML = "❗ ادخل رقم";
-                    resultDiv.className = "warning";
+                    document.getElementById("result").innerText = "❗ ادخل رقم";
                     return;
                 }
 
-                try {
-                    const response = await fetch(`${API_URL}?id=${id}`);
-                    const data = await response.json();
+                const frame = document.getElementById("hiddenFrame");
 
-                    if (data.status === "success") {
-                        resultDiv.innerHTML = `✅ مرحبًا ${data.name} في الحفل 🎉`;
-                        resultDiv.className = "success";
-                    } else if (data.status === "exists") {
-                        resultDiv.innerHTML = "⚠️ تم تسجيل حضورك بالفعل";
-                        resultDiv.className = "warning";
-                    } else {
-                        resultDiv.innerHTML = "❌ الرقم غير موجود";
-                        resultDiv.className = "error";
+                frame.onload = function () {
+                    try {
+                        const text = frame.contentDocument.body.innerText;
+
+                        if (text.startsWith("success")) {
+                            const name = text.split(":")[1];
+                            document.getElementById("result").innerText =
+                                `✅ مرحبًا ${name} 🎉`;
+                        } else if (text === "exists") {
+                            document.getElementById("result").innerText =
+                                "⚠️ تم تسجيلك قبل كده";
+                        } else {
+                            document.getElementById("result").innerText =
+                                "❌ الرقم غير موجود";
+                        }
+                    } catch (e) {
+                        document.getElementById("result").innerText =
+                            "❌ خطأ في القراءة";
                     }
-                } catch (error) {
-                    resultDiv.innerHTML = "❌ حصل خطأ في الاتصال";
-                    resultDiv.className = "error";
-                }
+                };
+
+                frame.src = `${API_URL}?id=${id}`;
             }
         </script>
     </body>
