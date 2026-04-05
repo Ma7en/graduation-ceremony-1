@@ -74,7 +74,7 @@
 
         <script>
             const API_URL =
-                "https://script.google.com/macros/s/AKfycbwVXuM-KJyJnDZiwv4iDBADRWRyyVMMNqLt5ZzSRsfZrdPa5R83lockDtPGYewX6fgf/exec"; // حط لينك Google Script هنا
+                "https://script.google.com/macros/s/AKfycbwVXuM-KJyJnDZiwv4iDBADRWRyyVMMNqLt5ZzSRsfZrdPa5R83lockDtPGYewX6fgf/exec";
 
             async function checkAttendance() {
                 const id = document.getElementById("userId").value;
@@ -105,7 +105,7 @@
                         resultDiv.className = "error";
                     }
                 } catch (error) {
-                    resultDiv.innerHTML = "❌ حدث خطأ في الاتصال";
+                    resultDiv.innerHTML = "❌ حصل خطأ في الاتصال";
                     resultDiv.className = "error";
                 }
             }
