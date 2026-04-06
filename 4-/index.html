@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ar">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, user-scalable=yes"
+        />
+        <title>تسجيل حضور حفل التخرج</title>
+        <!-- إضافة مكتبة JavaScript Qr Scanner -->
+        <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+        <style>
+            /* نفس التصميم السابق مع تعديلات بسيطة */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Tajawal", "Segoe UI", sans-serif;
+            }
+            body {
+                min-height: 100vh;
+                background: linear-gradient(145deg, #001f3f 0%, #003366 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+            .container {
+                max-width: 600px;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 48px;
+                overflow: hidden;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            }
+            .header {
+                background: linear-gradient(135deg, #d4af37 0%, #ffd966 100%);
+                padding: 25px 20px;
+                text-align: center;
+            }
+            .logo {
+                width: 75px;
+                height: 75px;
+                background: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 12px;
+            }
+            .logo svg {
+                width: 50px;
+                height: 50px;
+            }
+            h1 {
+                font-size: 1.7rem;
+                margin-bottom: 5px;
+                color: #1a2a3a;
+            }
+            .sub {
+                font-size: 0.85rem;
+                opacity: 0.9;
+            }
+
+            /* التبويبات */
+            .tabs {
+                display: flex;
+                gap: 10px;
+                padding: 20px 20px 0;
+                background: white;
+            }
+            .tab-btn {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                background: #f1f5f9;
+                border-radius: 30px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            .tab-btn.active {
+                background: linear-gradient(90deg, #d4af37, #ffd966);
+                color: #001f3f;
+            }
+            .tab-content {
+                display: none;
+                padding: 20px;
+                background: white;
+            }
+            .tab-content.active {
+                display: block;
+            }
+
+            /* قسم رفع الصورة */
+            .upload-area {
+                border: 2px dashed #d4af37;
+                border-radius: 28px;
+                padding: 30px;
+                text-align: center;
+                background: #f8fafc;
+                cursor: pointer;
+                transition: all 0.3s;
+                margin-bottom: 20px;
+            }
+            .upload-area:hover {
+                background: #f1f5f9;
+            }
+            #fileInput {
+                display: none;
+            }
+            .upload-icon {
+                font-size: 48px;
+                margin-bottom: 10px;
+            }
+
+            /* الإدخال اليدوي */
+            .barcode-input {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 1.1rem;
+                border: 2px solid #e2e8f0;
+                border-radius: 60px;
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            button {
+                width: 100%;
+                background: linear-gradient(90deg, #00264d, #003d66);
+                border: none;
+                padding: 16px;
+                border-radius: 60px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: white;
+                cursor: pointer;
+            }
+            .message-card {
+                margin-top: 20px;
+                padding: 16px;
+                border-radius: 28px;
+                text-align: center;
+                font-weight: 600;
+            }
+            .success {
+                background: #e6f9ed;
+                color: #0a5c2e;
+                border-right: 6px solid #2ecc71;
+            }
+            .used {
+                background: #ffe8e6;
+                color: #b91c1c;
+                border-right: 6px solid #e74c3c;
+            }
+            .notfound {
+                background: #fff4e5;
+                color: #b45309;
+                border-right: 6px solid #f39c12;
+            }
+
+            @media (max-width: 550px) {
+                .upload-area {
+                    padding: 20px;
+                }
+            }
+            footer {
+                text-align: center;
+                padding: 12px;
+                background: #f0f4f9;
+                font-size: 0.7rem;
+            }
+            .warning-note {
+                background: #fff3cd;
+                padding: 10px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                margin-top: 15px;
+                text-align: center;
+                color: #856404;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M12 3L1 9L12 15L23 9L12 3Z"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                            fill="#FFD966"
+                        />
+                        <path
+                            d="M5 12L5 16.5C5 17.9 8.1 19 12 19C15.9 19 19 17.9 19 16.5L19 12"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                            fill="none"
+                        />
+                        <path
+                            d="M12 21V19"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                        />
+                        <circle cx="12" cy="11" r="1.5" fill="#D4AF37" />
+                    </svg>
+                </div>
+                <h1>حفل التخرج</h1>
+                <div class="sub">امسح QR Code أو أدخل الرقم يدوياً</div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('scan')">
+                    📷 مسح QR Code
+                </button>
+                <button class="tab-btn" onclick="switchTab('manual')">
+                    ⌨️ إدخال يدوي
+                </button>
+            </div>
+
+            <!-- تبويب مسح QR Code (رفع صورة) -->
+            <div id="scanTab" class="tab-content active">
+                <div
+                    class="upload-area"
+                    onclick="document.getElementById('fileInput').click()"
+                >
+                    <div class="upload-icon">📸</div>
+                    <div>اضغط لاختيار صورة QR Code من المعرض</div>
+                    <div style="font-size: 12px; margin-top: 8px">
+                        أو التقط صورة بالكاميرا
+                    </div>
+                </div>
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept="image/*"
+                    capture="environment"
+                />
+                <div
+                    id="scanMessage"
+                    class="message-card"
+                    style="background: #f1f5f9"
+                >
+                    📷 اضغط على المنطقة أعلاه لاختيار صورة تحتوي على QR Code
+                </div>
+                <div class="warning-note">
+                    ⚠️ ملاحظة: إذا كانت الكاميرا لا تعمل مباشرة، استخدم هذا
+                    الخيار لرفع صورة QR Code من المعرض.<br />
+                    تأكد من أن الصورة واضحة والإضاءة جيدة.
+                </div>
+            </div>
+
+            <!-- تبويب الإدخال اليدوي -->
+            <div id="manualTab" class="tab-content">
+                <input
+                    type="text"
+                    id="manualBarcode"
+                    class="barcode-input"
+                    placeholder="أدخل رقم الباركود يدوياً"
+                />
+                <button id="manualCheckBtn">✅ تأكيد الحضور</button>
+                <div
+                    id="manualMessage"
+                    class="message-card"
+                    style="background: #f1f5f9"
+                >
+                    ✨ أدخل الرقم ثم اضغط تأكيد
+                </div>
+            </div>
+
+            <footer>
+                نظام تسجيل الحضور الذكي – يمكنك مسح QR Code من الصور أو الإدخال
+                اليدوي
+            </footer>
+        </div>
+
+        <script>
+            let html5QrCode = null;
+
+            // تبديل التبويبات
+            window.switchTab = function (tab) {
+                document
+                    .querySelectorAll(".tab-btn")
+                    .forEach((btn) => btn.classList.remove("active"));
+                if (tab === "scan") {
+                    document
+                        .querySelector(".tab-btn:first-child")
+                        .classList.add("active");
+                    document.getElementById("scanTab").classList.add("active");
+                    document
+                        .getElementById("manualTab")
+                        .classList.remove("active");
+                } else {
+                    document
+                        .querySelector(".tab-btn:last-child")
+                        .classList.add("active");
+                    document
+                        .getElementById("manualTab")
+                        .classList.add("active");
+                    document
+                        .getElementById("scanTab")
+                        .classList.remove("active");
+                }
+            };
+
+            // رفع صورة وقراءة QR Code منها
+            const fileInput = document.getElementById("fileInput");
+            const scanMessageDiv = document.getElementById("scanMessage");
+
+            function showScanMessage(text, type) {
+                scanMessageDiv.innerHTML = text;
+                scanMessageDiv.classList.remove("success", "used", "notfound");
+                if (type === "success") scanMessageDiv.classList.add("success");
+                else if (type === "used") scanMessageDiv.classList.add("used");
+                else if (type === "notfound")
+                    scanMessageDiv.classList.add("notfound");
+            }
+
+            fileInput.addEventListener("change", async (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                showScanMessage("⏳ جاري قراءة الصورة...", "");
+
+                // استخدام Html5Qrcode لقراءة الصورة
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("reader");
+                }
+
+                try {
+                    const decodedText = await html5QrCode.scanFile(file, false);
+                    // تم قراءة QR Code بنجاح
+                    showScanMessage(
+                        "⏳ تم قراءة الرمز: " +
+                            decodedText +
+                            " - جاري التحقق...",
+                        "",
+                    );
+
+                    // استدعاء خدمة Google Sheets
+                    google.script.run
+                        .withSuccessHandler(function (response) {
+                            if (response.status === "success") {
+                                showScanMessage(response.message, "success");
+                            } else if (response.status === "used") {
+                                showScanMessage(response.message, "used");
+                            } else if (response.status === "notfound") {
+                                showScanMessage(response.message, "notfound");
+                            }
+                            // إعادة تعيين حقل الملف ليمكن رفع ملف جديد
+                            fileInput.value = "";
+                        })
+                        .withFailureHandler(function (error) {
+                            showScanMessage(
+                                "⚠️ فشل الاتصال بالخادم: " + error.message,
+                                "notfound",
+                            );
+                            fileInput.value = "";
+                        })
+                        .checkAttendance(decodedText);
+                } catch (error) {
+                    console.error(error);
+                    showScanMessage(
+                        "⚠️ لم يتم التعرف على QR Code في الصورة. تأكد من وضوح الرمز.",
+                        "notfound",
+                    );
+                    fileInput.value = "";
+                }
+            });
+
+            // ========== القسم اليدوي (نفس السابق) ==========
+            const manualInput = document.getElementById("manualBarcode");
+            const manualBtn = document.getElementById("manualCheckBtn");
+            const manualMsgDiv = document.getElementById("manualMessage");
+
+            function showManualMessage(text, type) {
+                manualMsgDiv.innerHTML = text;
+                manualMsgDiv.classList.remove("success", "used", "notfound");
+                if (type === "success") manualMsgDiv.classList.add("success");
+                else if (type === "used") manualMsgDiv.classList.add("used");
+                else if (type === "notfound")
+                    manualMsgDiv.classList.add("notfound");
+            }
+
+            function checkManualBarcode() {
+                let barcode = manualInput.value.trim();
+                if (barcode === "") {
+                    showManualMessage(
+                        "⚠️ يرجى إدخال رقم الباركود أولاً",
+                        "notfound",
+                    );
+                    return;
+                }
+
+                manualBtn.disabled = true;
+                manualBtn.style.opacity = "0.7";
+                showManualMessage("⏳ جاري التحقق...", "");
+
+                google.script.run
+                    .withSuccessHandler(function (response) {
+                        manualBtn.disabled = false;
+                        manualBtn.style.opacity = "1";
+                        if (response.status === "success") {
+                            showManualMessage(response.message, "success");
+                            manualInput.value = "";
+                            manualInput.focus();
+                        } else if (response.status === "used") {
+                            showManualMessage(response.message, "used");
+                            manualInput.value = "";
+                            manualInput.focus();
+                        } else if (response.status === "notfound") {
+                            showManualMessage(response.message, "notfound");
+                            manualInput.select();
+                        }
+                    })
+                    .withFailureHandler(function (error) {
+                        manualBtn.disabled = false;
+                        manualBtn.style.opacity = "1";
+                        showManualMessage("⚠️ فشل الاتصال بالخادم", "notfound");
+                    })
+                    .checkAttendance(barcode);
+            }
+
+            manualBtn.addEventListener("click", checkManualBarcode);
+            manualInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") checkManualBarcode();
+            });
+        </script>
+    </body>
+</html>

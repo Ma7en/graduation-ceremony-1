@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="ar">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover"
+        />
+        <title>تسجيل حضور حفل التخرج - QR Code</title>
+        <!-- إضافة مكتبة HTML5-QRCode -->
+        <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Tajawal", "Segoe UI", system-ui, sans-serif;
+            }
+
+            body {
+                min-height: 100vh;
+                background: linear-gradient(145deg, #001f3f 0%, #003366 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 600px;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 48px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                overflow: hidden;
+                transition: transform 0.2s ease;
+            }
+
+            /* الرأس مع الشعار */
+            .header {
+                background: linear-gradient(135deg, #d4af37 0%, #ffd966 100%);
+                padding: 25px 20px 20px;
+                text-align: center;
+                border-bottom-left-radius: 35px;
+                border-bottom-right-radius: 35px;
+                color: #1a2a3a;
+            }
+
+            .logo {
+                width: 75px;
+                height: 75px;
+                background: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 12px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .logo svg {
+                width: 50px;
+                height: 50px;
+            }
+
+            h1 {
+                font-size: 1.7rem;
+                font-weight: 800;
+                margin-bottom: 5px;
+            }
+
+            .sub {
+                font-size: 0.85rem;
+                opacity: 0.9;
+            }
+
+            /* التبويبات */
+            .tabs {
+                display: flex;
+                gap: 10px;
+                padding: 20px 20px 0;
+                background: white;
+            }
+
+            .tab-btn {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                background: #f1f5f9;
+                border-radius: 30px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+                color: #334155;
+                font-size: 1rem;
+            }
+
+            .tab-btn.active {
+                background: linear-gradient(90deg, #d4af37, #ffd966);
+                color: #001f3f;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            /* المحتوى */
+            .tab-content {
+                display: none;
+                padding: 20px;
+                background: white;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            /* كاميرا */
+            .camera-container {
+                background: #000;
+                border-radius: 28px;
+                overflow: hidden;
+                position: relative;
+                margin-bottom: 15px;
+            }
+
+            #reader {
+                width: 100%;
+                min-height: 350px;
+                border: none;
+            }
+
+            .camera-controls {
+                display: flex;
+                gap: 10px;
+                margin-top: 12px;
+            }
+
+            .cam-btn {
+                flex: 1;
+                background: #001f3f;
+                padding: 12px;
+                border: none;
+                border-radius: 40px;
+                color: white;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .cam-btn:active {
+                transform: scale(0.97);
+            }
+
+            /* حقل الإدخال اليدوي */
+            .input-group {
+                margin-bottom: 20px;
+            }
+
+            .barcode-input {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 1.1rem;
+                border: 2px solid #e2e8f0;
+                border-radius: 60px;
+                outline: none;
+                text-align: center;
+                font-weight: 500;
+                background: #f8fafc;
+            }
+
+            .barcode-input:focus {
+                border-color: #d4af37;
+                box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+            }
+
+            button {
+                width: 100%;
+                background: linear-gradient(90deg, #00264d, #003d66);
+                border: none;
+                padding: 16px;
+                border-radius: 60px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: white;
+                cursor: pointer;
+                transition: all 0.25s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            button:active {
+                transform: scale(0.97);
+            }
+
+            /* رسالة الحالة */
+            .message-card {
+                margin-top: 20px;
+                padding: 16px;
+                border-radius: 28px;
+                text-align: center;
+                font-weight: 600;
+                font-size: 1rem;
+                transition: all 0.3s;
+                background: #f1f5f9;
+                color: #0f172a;
+                border-right: 6px solid #d4af37;
+            }
+
+            .success {
+                background: #e6f9ed;
+                color: #0a5c2e;
+                border-right-color: #2ecc71;
+            }
+            .used {
+                background: #ffe8e6;
+                color: #b91c1c;
+                border-right-color: #e74c3c;
+            }
+            .notfound {
+                background: #fff4e5;
+                color: #b45309;
+                border-right-color: #f39c12;
+            }
+
+            /* متجاوب */
+            @media (max-width: 550px) {
+                .container {
+                    border-radius: 32px;
+                }
+                .tab-content {
+                    padding: 16px;
+                }
+                #reader {
+                    min-height: 280px;
+                }
+                h1 {
+                    font-size: 1.5rem;
+                }
+            }
+
+            .note {
+                font-size: 0.7rem;
+                text-align: center;
+                color: #5b6e8c;
+                margin-top: 15px;
+            }
+
+            footer {
+                text-align: center;
+                padding: 12px;
+                background: #f0f4f9;
+                font-size: 0.7rem;
+                color: #2c3e66;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M12 3L1 9L12 15L23 9L12 3Z"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            fill="#FFD966"
+                        />
+                        <path
+                            d="M5 12L5 16.5C5 17.9 8.1 19 12 19C15.9 19 19 17.9 19 16.5L19 12"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                            fill="none"
+                        />
+                        <path
+                            d="M12 21V19"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                        />
+                        <circle cx="12" cy="11" r="1.5" fill="#D4AF37" />
+                    </svg>
+                </div>
+                <h1>حفل التخرج</h1>
+                <div class="sub">امسح QR Code أو أدخل الرقم يدوياً</div>
+            </div>
+
+            <!-- التبويبات -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('camera')">
+                    📷 كاميرا QR
+                </button>
+                <button class="tab-btn" onclick="switchTab('manual')">
+                    ⌨️ إدخال يدوي
+                </button>
+            </div>
+
+            <!-- تبويب الكاميرا -->
+            <div id="cameraTab" class="tab-content active">
+                <div class="camera-container">
+                    <div id="reader"></div>
+                </div>
+                <div class="camera-controls">
+                    <button class="cam-btn" id="switchCameraBtn">
+                        🔄 تبديل الكاميرا
+                    </button>
+                </div>
+                <div class="note">
+                    📱 وجّه الكاميرا إلى رمز QR الموجود على بطاقة الدعوة
+                </div>
+                <div id="cameraMessage" class="message-card">
+                    📷 انتظار قراءة QR Code...
+                </div>
+            </div>
+
+            <!-- تبويب الإدخال اليدوي -->
+            <div id="manualTab" class="tab-content">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="manualBarcode"
+                        class="barcode-input"
+                        placeholder="أدخل رقم الباركود يدوياً"
+                        autocomplete="off"
+                    />
+                </div>
+                <button id="manualCheckBtn">
+                    <span>✅</span> تأكيد الحضور
+                </button>
+                <div id="manualMessage" class="message-card">
+                    ✨ أدخل الرقم ثم اضغط تأكيد
+                </div>
+            </div>
+
+            <footer>نظام تسجيل الحضور الذكي – QR Code + باركود يدوي</footer>
+        </div>
+
+        <script>
+            // متغيرات الكاميرا
+            let html5QrCode = null;
+            let currentCameraId = null;
+            let cameras = [];
+            let isScanning = false;
+
+            // دالة تبديل التبويبات
+            window.switchTab = function (tab) {
+                // تحديث التبويبات
+                document
+                    .querySelectorAll(".tab-btn")
+                    .forEach((btn) => btn.classList.remove("active"));
+                if (tab === "camera") {
+                    document
+                        .querySelector(".tab-btn:first-child")
+                        .classList.add("active");
+                    document
+                        .getElementById("cameraTab")
+                        .classList.add("active");
+                    document
+                        .getElementById("manualTab")
+                        .classList.remove("active");
+                    startCamera();
+                } else {
+                    document
+                        .querySelector(".tab-btn:last-child")
+                        .classList.add("active");
+                    document
+                        .getElementById("manualTab")
+                        .classList.add("active");
+                    document
+                        .getElementById("cameraTab")
+                        .classList.remove("active");
+                    stopCamera();
+                }
+            };
+
+            // بدء الكاميرا
+            async function startCamera() {
+                if (html5QrCode && isScanning) return;
+
+                if (html5QrCode) {
+                    try {
+                        await html5QrCode.stop();
+                    } catch (e) {}
+                }
+
+                html5QrCode = new Html5Qrcode("reader");
+
+                try {
+                    const devices = await Html5Qrcode.getCameras();
+                    if (!devices || devices.length === 0) {
+                        showCameraMessage(
+                            "⚠️ لم يتم العثور على كاميرا",
+                            "notfound",
+                        );
+                        return;
+                    }
+
+                    cameras = devices;
+                    // استخدام الكاميرا الخلفية إن وجدت
+                    currentCameraId =
+                        devices.find((device) =>
+                            device.label.toLowerCase().includes("back"),
+                        )?.id || devices[0].id;
+
+                    await html5QrCode.start(
+                        currentCameraId,
+                        {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 },
+                            aspectRatio: 1.0,
+                        },
+                        onQRCodeSuccess,
+                        onQRCodeError,
+                    );
+                    isScanning = true;
+                    showCameraMessage(
+                        "📷 الكاميرا تعمل... وجهها نحو QR Code",
+                        "",
+                    );
+                } catch (err) {
+                    console.error(err);
+                    showCameraMessage(
+                        "❌ تعذر تشغيل الكاميرا. تأكد من منح الإذن",
+                        "notfound",
+                    );
+                }
+            }
+
+            // عند قراءة QR Code بنجاح
+            async function onQRCodeSuccess(decodedText) {
+                // إيقاف المسح مؤقتاً لمنع التكرار
+                if (html5QrCode && isScanning) {
+                    await html5QrCode.pause();
+                    isScanning = false;
+                }
+
+                showCameraMessage(
+                    "⏳ جاري التحقق من الرمز: " + decodedText,
+                    "",
+                );
+
+                // استدعاء نفس دالة التحقق من Google Sheets
+                google.script.run
+                    .withSuccessHandler(function (response) {
+                        if (response.status === "success") {
+                            showCameraMessage(response.message, "success");
+                            // إعادة تشغيل المسح بعد 2 ثانية
+                            setTimeout(() => resumeScanning(), 2000);
+                        } else if (response.status === "used") {
+                            showCameraMessage(response.message, "used");
+                            setTimeout(() => resumeScanning(), 2000);
+                        } else if (response.status === "notfound") {
+                            showCameraMessage(response.message, "notfound");
+                            setTimeout(() => resumeScanning(), 2000);
+                        } else {
+                            showCameraMessage("⚠️ خطأ غير متوقع", "notfound");
+                            setTimeout(() => resumeScanning(), 2000);
+                        }
+                    })
+                    .withFailureHandler(function (error) {
+                        console.error(error);
+                        showCameraMessage("⚠️ فشل الاتصال بالخادم", "notfound");
+                        setTimeout(() => resumeScanning(), 2000);
+                    })
+                    .checkAttendance(decodedText);
+            }
+
+            function onQRCodeError(errorMessage) {
+                // لا نفعل شيئاً، مجرد تجاهل أخطاء القراءة المؤقتة
+            }
+
+            async function resumeScanning() {
+                if (html5QrCode && !isScanning) {
+                    try {
+                        await html5QrCode.resume();
+                        isScanning = true;
+                        showCameraMessage("📷 جاهز لمسح رمز آخر", "");
+                    } catch (e) {}
+                }
+            }
+
+            function stopCamera() {
+                if (html5QrCode && isScanning) {
+                    html5QrCode
+                        .stop()
+                        .then(() => {
+                            isScanning = false;
+                        })
+                        .catch((e) => console.log(e));
+                }
+            }
+
+            function showCameraMessage(text, type) {
+                const msgDiv = document.getElementById("cameraMessage");
+                msgDiv.innerHTML = text;
+                msgDiv.classList.remove("success", "used", "notfound");
+                if (type === "success") msgDiv.classList.add("success");
+                else if (type === "used") msgDiv.classList.add("used");
+                else if (type === "notfound") msgDiv.classList.add("notfound");
+            }
+
+            // تبديل الكاميرا (أمامية/خلفية)
+            document
+                .getElementById("switchCameraBtn")
+                ?.addEventListener("click", async () => {
+                    if (!cameras.length) return;
+                    // البحث عن الكاميرا التالية
+                    const currentIndex = cameras.findIndex(
+                        (c) => c.id === currentCameraId,
+                    );
+                    const nextIndex = (currentIndex + 1) % cameras.length;
+                    const nextCameraId = cameras[nextIndex].id;
+
+                    if (html5QrCode && isScanning) {
+                        await html5QrCode.stop();
+                        isScanning = false;
+                        try {
+                            await html5QrCode.start(
+                                nextCameraId,
+                                {
+                                    fps: 10,
+                                    qrbox: { width: 250, height: 250 },
+                                    aspectRatio: 1.0,
+                                },
+                                onQRCodeSuccess,
+                                onQRCodeError,
+                            );
+                            currentCameraId = nextCameraId;
+                            isScanning = true;
+                            showCameraMessage("🔄 تم تبديل الكاميرا", "");
+                        } catch (e) {
+                            showCameraMessage(
+                                "❌ فشل تبديل الكاميرا",
+                                "notfound",
+                            );
+                        }
+                    }
+                });
+
+            // ========== القسم اليدوي ==========
+            const manualInput = document.getElementById("manualBarcode");
+            const manualBtn = document.getElementById("manualCheckBtn");
+            const manualMsgDiv = document.getElementById("manualMessage");
+
+            function showManualMessage(text, type) {
+                manualMsgDiv.innerHTML = text;
+                manualMsgDiv.classList.remove("success", "used", "notfound");
+                if (type === "success") manualMsgDiv.classList.add("success");
+                else if (type === "used") manualMsgDiv.classList.add("used");
+                else if (type === "notfound")
+                    manualMsgDiv.classList.add("notfound");
+            }
+
+            function checkManualBarcode() {
+                let barcode = manualInput.value.trim();
+                if (barcode === "") {
+                    showManualMessage(
+                        "⚠️ يرجى إدخال رقم الباركود أولاً",
+                        "notfound",
+                    );
+                    return;
+                }
+
+                manualBtn.disabled = true;
+                manualBtn.style.opacity = "0.7";
+                showManualMessage("⏳ جاري التحقق...", "");
+
+                google.script.run
+                    .withSuccessHandler(function (response) {
+                        manualBtn.disabled = false;
+                        manualBtn.style.opacity = "1";
+                        if (response.status === "success") {
+                            showManualMessage(response.message, "success");
+                            manualInput.value = "";
+                            manualInput.focus();
+                        } else if (response.status === "used") {
+                            showManualMessage(response.message, "used");
+                            manualInput.value = "";
+                            manualInput.focus();
+                        } else if (response.status === "notfound") {
+                            showManualMessage(response.message, "notfound");
+                            manualInput.select();
+                        } else {
+                            showManualMessage("⚠️ خطأ غير متوقع", "notfound");
+                        }
+                    })
+                    .withFailureHandler(function (error) {
+                        manualBtn.disabled = false;
+                        manualBtn.style.opacity = "1";
+                        showManualMessage("⚠️ فشل الاتصال بالخادم", "notfound");
+                    })
+                    .checkAttendance(barcode);
+            }
+
+            manualBtn.addEventListener("click", checkManualBarcode);
+            manualInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    checkManualBarcode();
+                }
+            });
+
+            // بدء الكاميرا تلقائياً عند تحميل الصفحة
+            window.addEventListener("load", () => {
+                startCamera();
+            });
+
+            // إيقاف الكاميرا عند مغادرة الصفحة (لحسن الأداء)
+            window.addEventListener("beforeunload", () => {
+                if (html5QrCode && isScanning) {
+                    html5QrCode.stop();
+                }
+            });
+        </script>
+    </body>
+</html>
