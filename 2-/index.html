@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ar">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, user-scalable=yes"
+        />
+        <title>تسجيل حضور حفل التخرج</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Tajawal", "Segoe UI", system-ui, sans-serif;
+            }
+
+            body {
+                min-height: 100vh;
+                background: linear-gradient(145deg, #001f3f 0%, #003366 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            /* الحاوية الرئيسية */
+            .container {
+                /* max-width: 550px; */
+                max-width: 85%;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 48px;
+                box-shadow:
+                    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+                overflow: hidden;
+                backdrop-filter: blur(2px);
+                transition: transform 0.2s ease;
+            }
+
+            /* رأس الصفحة مع الشعار */
+            .header {
+                background: linear-gradient(135deg, #d4af37 0%, #ffd966 100%);
+                padding: 30px 20px 25px;
+                text-align: center;
+                border-bottom-left-radius: 35px;
+                border-bottom-right-radius: 35px;
+                color: #1a2a3a;
+            }
+
+            .logo {
+                width: 85px;
+                height: 85px;
+                background: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 15px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .logo svg {
+                width: 60px;
+                height: 60px;
+            }
+
+            h1 {
+                font-size: 1.9rem;
+                font-weight: 800;
+                letter-spacing: -0.5px;
+                margin-bottom: 6px;
+            }
+
+            .sub {
+                font-size: 0.95rem;
+                opacity: 0.9;
+                font-weight: 500;
+            }
+
+            /* المحتوى */
+            .content {
+                padding: 32px 28px 40px;
+            }
+
+            .input-group {
+                margin-bottom: 25px;
+            }
+
+            label {
+                display: block;
+                font-weight: 700;
+                color: #00264d;
+                margin-bottom: 8px;
+                font-size: 0.95rem;
+            }
+
+            .barcode-input {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 1.2rem;
+                border: 2px solid #e2e8f0;
+                border-radius: 60px;
+                outline: none;
+                transition: all 0.3s;
+                background: #f8fafc;
+                text-align: center;
+                letter-spacing: 1px;
+                font-weight: 500;
+            }
+
+            .barcode-input:focus {
+                border-color: #d4af37;
+                box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+                background: white;
+            }
+
+            button {
+                width: 100%;
+                background: linear-gradient(90deg, #00264d, #003d66);
+                border: none;
+                padding: 16px;
+                border-radius: 60px;
+                font-size: 1.25rem;
+                font-weight: bold;
+                color: white;
+                cursor: pointer;
+                transition: all 0.25s;
+                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+            }
+
+            button:active {
+                transform: scale(0.97);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            /* رسالة الحالة */
+            .message-card {
+                margin-top: 30px;
+                padding: 18px 20px;
+                border-radius: 28px;
+                text-align: center;
+                font-weight: 600;
+                font-size: 1.05rem;
+                transition: all 0.3s ease;
+                background: #f1f5f9;
+                color: #0f172a;
+                border-right: 8px solid #d4af37;
+            }
+
+            .success {
+                background: #e6f9ed;
+                color: #0a5c2e;
+                border-right-color: #2ecc71;
+            }
+            .used {
+                background: #ffe8e6;
+                color: #b91c1c;
+                border-right-color: #e74c3c;
+            }
+            .notfound {
+                background: #fff4e5;
+                color: #b45309;
+                border-right-color: #f39c12;
+            }
+
+            /* تصميم متجاوب */
+            @media (max-width: 550px) {
+                .content {
+                    padding: 24px 20px 32px;
+                }
+                h1 {
+                    font-size: 1.6rem;
+                }
+                .logo {
+                    width: 70px;
+                    height: 70px;
+                }
+                .logo svg {
+                    width: 48px;
+                    height: 48px;
+                }
+            }
+
+            /* تلميحات */
+            .demo-note {
+                margin-top: 20px;
+                font-size: 0.75rem;
+                text-align: center;
+                color: #5b6e8c;
+            }
+            footer {
+                text-align: center;
+                padding: 12px;
+                background: #f0f4f9;
+                font-size: 0.7rem;
+                color: #2c3e66;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <!-- شعار تخرج (كاب وقبعة) -->
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M12 3L1 9L12 15L23 9L12 3Z"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            fill="#FFD966"
+                        />
+                        <path
+                            d="M5 12L5 16.5C5 17.9 8.1 19 12 19C15.9 19 19 17.9 19 16.5L19 12"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                            fill="none"
+                        />
+                        <path
+                            d="M12 21V19"
+                            stroke="#1e2f47"
+                            stroke-width="1.5"
+                        />
+                        <circle cx="12" cy="11" r="1.5" fill="#D4AF37" />
+                    </svg>
+                </div>
+
+                <h1>حفل تخرج - مدارس تربية الأجيال</h1>
+
+                <!-- <div class="sub">سجل حضورك بمسح الباركود</div> -->
+            </div>
+
+            <div class="content">
+                <div class="input-group">
+                    <!-- <label>📷 امسح الرمز أو أدخله يدوياً</label> -->
+                    <!-- <input type="text" id="barcodeInput" class="barcode-input" placeholder="أدخل رقم الباركود" autocomplete="off" autofocus> -->
+
+                    <input
+                        type="number"
+                        id="barcodeInput"
+                        class="barcode-input"
+                        placeholder="أدخل رقم الباركود"
+                        autocomplete="off"
+                        min="1"
+                        autofocus
+                        inputmode="numeric"
+                    />
+                </div>
+
+                <button id="checkBtn"><span>✅</span> تأكيد الحضور</button>
+
+                <div id="messageBox" class="message-card">
+                    ✨ انتظر إدخال الرقم لتأكيد حضورك
+                </div>
+
+                <!-- <div class="demo-note">
+            ⚡ تأكد من أن الباركود موجود في جدول Google Sheets (العمود A)
+        </div> -->
+            </div>
+
+            <footer>حفل التخرج - مدارس تربية الأجيال</footer>
+        </div>
+
+        <script>
+            const btn = document.getElementById("checkBtn");
+            const inputField = document.getElementById("barcodeInput");
+            const msgDiv = document.getElementById("messageBox");
+
+            // استدعاء دالة Google Apps Script
+            function checkBarcode() {
+                let barcode = inputField.value.trim();
+                if (barcode === "") {
+                    showMessage("⚠️ يرجى إدخال رقم الباركود أولاً", "notfound");
+                    return;
+                }
+
+                // تعطيل الزر مؤقتاً لمنع التكرار
+                btn.disabled = true;
+                btn.style.opacity = "0.7";
+                showMessage("⏳ جاري التحقق من الرجاء الانتظار...", "");
+
+                google.script.run
+                    .withSuccessHandler(function (response) {
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                        if (response.status === "success") {
+                            showMessage(response.message, "success");
+                            inputField.value = ""; // تفريغ الحقل لاستخدام آخر
+                            inputField.focus();
+                        } else if (response.status === "used") {
+                            showMessage(response.message, "used");
+                            inputField.value = "";
+                            inputField.focus();
+                        } else if (response.status === "notfound") {
+                            showMessage(response.message, "notfound");
+                            inputField.select();
+                        } else {
+                            showMessage(
+                                "⚠️ خطأ غير متوقع، حاول مرة أخرى",
+                                "notfound",
+                            );
+                        }
+                    })
+                    .withFailureHandler(function (error) {
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                        console.error(error);
+                        showMessage(
+                            "⚠️ فشل الاتصال بالخادم. تأكد من الاتصال بالإنترنت.",
+                            "notfound",
+                        );
+                    })
+                    .checkAttendance(barcode);
+            }
+
+            function showMessage(text, type) {
+                msgDiv.innerHTML = text;
+                msgDiv.classList.remove("success", "used", "notfound");
+                if (type === "success") msgDiv.classList.add("success");
+                else if (type === "used") msgDiv.classList.add("used");
+                else if (type === "notfound") msgDiv.classList.add("notfound");
+            }
+
+            btn.addEventListener("click", checkBarcode);
+            inputField.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    checkBarcode();
+                }
+            });
+
+            // عند تحميل الصفحة يتم التركيز على الحقل
+            window.addEventListener("load", function () {
+                inputField.focus();
+            });
+        </script>
+    </body>
+</html>
